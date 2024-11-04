@@ -26,6 +26,12 @@ export class WorkplaceController {
     return this.workplaceService.findAll();
   }
 
+  @Get('fetch-external')
+  async fetchAndStoreExternalData() {
+    await this.workplaceService.fetchAndStoreExternalData();
+    return { message: 'Data fetched and stored successfully' };
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.workplaceService.findOne(Number(id));
