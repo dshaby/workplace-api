@@ -8,6 +8,7 @@
 // Handling complex logic
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import axios from 'axios';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -54,5 +55,24 @@ export class WorkplaceService {
   // Delete a workplace by ID
   async delete(id: number) {
     return this.prisma.workplace.delete({ where: { id } });
+  }
+
+  // Function to fetch and store external data
+  async fetchAndStoreExternalData() {
+    try {
+      const { data } = await axios.get(
+        'https://jsonplaceholder.typicode.com/posts',
+      );
+
+      const filteredData = data.filter((post) => post.title.length > 20);
+
+      for (const item of filteredData) {
+        await this.prisma.workplace.create({
+          data: { name: item.title, active: item.body.length > 175 },
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching data', error);
+    }
   }
 }
